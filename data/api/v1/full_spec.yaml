@@ -11647,6 +11647,25 @@ components:
             type: string
           type: array
       type: object
+    SyntheticsTriggerPublicIdentifiers:
+      description: A list of identifiers of Synthetics tests to trigger.
+      properties:
+        tests:
+          description: An array of IDs of Synthetics tests to trigger.
+          example: []
+          items:
+            description: The ID of a Synthetics test to trigger.
+            example: abc-def-123
+            type: string
+          type: array
+      type: object
+    SyntheticsTriggerTestBody:
+      description: Either an object describing the Synthetics tests to trigger, or
+        a list of Synthetics test IDs.
+      oneOf:
+      - $ref: '#/components/schemas/SyntheticsTriggerPublicIdentifiers'
+      - $ref: '#/components/schemas/SyntheticsCITestBody'
+      type: object
     SyntheticsUpdateTestPauseStatusPayload:
       description: Object to start or pause an existing Synthetic test.
       properties:
@@ -23981,6 +24000,36 @@ paths:
       x-menu-order: 14
       x-undo:
         type: idempotent
+  /api/v1/synthetics/tests/trigger:
+    post:
+      description: Trigger a set of Synthetics tests.
+      operationId: TriggerTests
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SyntheticsTriggerTestBody'
+        description: The identifiers of the tests to trigger.
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SyntheticsTriggerCITestsResponse'
+          description: OK
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+          description: Bad Request
+      summary: Trigger some Synthetics tests
+      tags:
+      - Synthetics
+      x-codegen-request-body-name: body
+      x-undo:
+        type: safe
   /api/v1/synthetics/tests/trigger/ci:
     post:
       description: Trigger a set of Synthetics tests for continuous integration.
